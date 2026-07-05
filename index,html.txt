@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siber Güvenlik: Parola Laboratuvarı</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .section { margin-bottom: 35px; padding: 15px; border-left: 5px solid #3498db; background: #fafafa; }
+        input, button { padding: 10px; font-size: 16px; margin: 5px 0; border-radius: 6px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        button { background-color: #2ecc71; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #27ae60; }
+        .result { background: #e8f4f8; padding: 12px; border-radius: 6px; margin-top: 10px; font-family: monospace; font-size: 15px; word-break: break-all; }
+        .alert { color: #c0392b; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔒 Siber Güvenlik Parola Laboratuvarı</h1>
+    <p>PDF rehberindeki siber güvenlik mimarisini test edebileceğiniz interaktif uygulama.</p>
+
+    <div class="section">
+        <h2>1. Parola vs. Şifre (Cipher) Ayrımı</h2>
+        <p>Giriş yaparken kullandığınız şey <b>Parola</b>'dır. <b>Şifre (Cipher)</b> ise veriyi gizleme algoritmasıdır.</p>
+        <input type="text" id="cipherInput" placeholder="Şifrelenecek düz metni yazın..." oninput="simulateCipher()">
+        <div class="result">🕵️‍♂️ Şifrelenmiş Metin (Cipher Text): <span id="cipherResult">-</span></div>
+    </div>
+
+    <div class="section">
+        <h2>2. Kırılmaz Parola Üretim Hattı</h2>
+        <p>Akılda kalıcı bir cümle girin, sistem onu mutasyona uğratsın.</p>
+        <input type="text" id="sentenceInput" placeholder="Örn: Bayılırım biber dolmasına Perşembeleri kahvaltıda">
+        <button onclick="generateSecurePassword()">Parola Üret</button>
+        <div class="result">🛠️ Üretilen Güçlü Parola: <span id="generatedPassword">-</span></div>
+    </div>
+
+    <div class="section">
+        <h2>3. Sistemin Arka Yüzü: Tuzlama & Hash</h2>
+        <p>Parolanız sistemde düz metin olarak saklanmaz. Rastgele veri (Tuz) eklenir ve Hash'lenir.</p>
+        <div class="result">🧂 Otomatik Eklenen Tuz: <span id="saltResult">rastgele_veri_99</span></div>
+        <div class="result">⚙️ Matematiksel Hash Değeri (SHA-256 Simülasyonu): <span id="hashResult">-</span></div>
+    </div>
+</div>
+
+<script>
+    // 1. Bölüm: Basit bir Sezar Şifreleme simülasyonu (3 harf kaydırma)
+    function simulateCipher() {
+        let text = document.getElementById('cipherInput').value;
+        let ciphered = text.split('').map(char => {
+            let code = char.charCodeAt(0);
+            return String.fromCharCode(code + 3); // Basit mutasyon
+        }).join('');
+        document.getElementById('cipherResult').innerText = text ? ciphered : "-";
+    }
+
+    // 2. ve 3. Bölüm: Cümleden Parola ve Hash üretimi
+    function generateSecurePassword() {
+        let sentence = document.getElementById('sentenceInput').value;
+        if(!sentence) return alert("Lütfen bir cümle girin!");
+
+        // Kelimelerin ilk ve son harflerini al
+        let words = sentence.split(' ');
+        let basePassword = words.map(word => {
+            if(word.length > 1) return word[0] + word[word.length - 1];
+            return word[0] || '';
+        }).join('');
+
+        // Güçlendirme (Mutasyon) B->8, b->6, i->!, a->@
+        let securePassword = basePassword
+            .replace(/B/g, '8').replace(/b/g, '6')
+            .replace(/i/g, '!').replace(/ı/g, '!')
+            .replace(/a/g, '@').replace(/o/g, '0');
+
+        document.getElementById('generatedPassword').innerText = securePassword;
+
+        // Arka yüz simülasyonu (Hash üretimi)
+        let salt = "salt_" + Math.random().toString(36).substring(2, 7);
+        document.getElementById('saltResult').innerText = salt;
+        
+        // Basit bir hash görüntüsü simüle edelim (Gerçek SHA için kütüphane gerekir)
+        let simulatedHash = btoa(securePassword + salt).substring(0, 16) + "...(SHA-256)";
+        document.getElementById('hashResult').innerText = simulatedHash;
+    }
+</script>
+
+</body>
+</html>
